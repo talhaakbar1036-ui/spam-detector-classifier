@@ -1,0 +1,7 @@
+{
+  "original_message": "Congratulations! You've won a free iPhone. Click here to claim.",
+  "cleaned_message": "congratul youv won free iphon click claim",
+  "prediction": "SPAM",
+  "spam_probability": 0.9567,
+  "ham_probability": 0.0433
+}

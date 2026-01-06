@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpamGuard - Message Filtering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #response-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SpamGuard - Message Filtering System</h1>
+        <p>Enter a message below to check if it's spam or ham.</p>
+        <textarea id="message-input" rows="6" placeholder="Type your message here..."></textarea>
+        <button onclick="predictSpam()">Predict</button>
+        <div id="response-area"></div>
+    </div>
+
+    <script>
+        async function predictSpam() {
+            const messageInput = document.getElementById('message-input').value;
+            const responseArea = document.getElementById('response-area');
+
+            if (!messageInput.trim()) {
+                responseArea.innerText = 'Please enter a message.';
+                return;
+            }
+
+            try {
+                responseArea.innerText = 'Predicting...';
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: messageInput })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseArea.innerHTML = `
+                        <b>Prediction:</b> ${data.prediction}<br>
+                        <b>Spam Probability:</b> ${(data.spam_probability * 100).toFixed(2)}%<br>
+                        <b>Ham Probability:</b> ${(data.ham_probability * 100).toFixed(2)}%<br>
+                        <b>Cleaned Message:</b> ${data.cleaned_message}
+                    `;
+                } else {
+                    responseArea.innerText = `Error: ${data.error || 'Something went wrong.'}`;
+                }
+            } catch (error) {
+                console.error('Error during prediction:', error);
+                responseArea.innerText = 'An error occurred while connecting to the server.';
+            }
+        }
+    </script>
+</body>
+</html>
