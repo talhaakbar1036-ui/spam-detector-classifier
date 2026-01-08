@@ -182,6 +182,13 @@ pip install pandas numpy matplotlib seaborn wordcloud nltk scikit-learn
 python
 
 nltk.download('punkt')
+
+## Feedback
+
+This project is still open to improvement.
+Suggestions and constructive feedback are very welcome.  
+Feel free to open an issue or submit a pull request.
+
 nltk.download('stopwords')
 
     Run the Jupyter notebook SpamGuard_(3).ipynb.
