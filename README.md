@@ -120,10 +120,10 @@ Key Insights:
 
     Naïve Bayes served as a good baseline but lagged slightly in recall.
     ## Model Accuracy
-    ![Model Accuracy](./images/accuracy.png)
+    ![Model Accuracy](./images/https://github.com/talhaakbar1036-ui/spam-detector-classifier/blob/main/images/accuracy.png)
 
     ## Confusion Matrix
-    ![Confusion Matrix](./images/confusion matrix.png)
+    ![Confusion Matrix](./images/https://github.com/talhaakbar1036-ui/spam-detector-classifier/blob/main/images/confusion matrix.png)
 
 
 7. Key Challenges & Solutions
