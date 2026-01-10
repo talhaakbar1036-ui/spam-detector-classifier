@@ -119,12 +119,12 @@ Key Insights:
     Logistic Regression also showed strong performance with faster training time.
 
     Naïve Bayes served as a good baseline but lagged slightly in recall.
-    ### Model Accuracy
-    ![Accuracy](images/accuracy.png)
+    ## Model Accuracy
+    ![Model Accuracy](./images/accuracy.png)
 
-    
-    ### Confusion Matrix
-    ![Confusion Matrix](images/confusion_matrix.png)
+    ## Confusion Matrix
+    ![Confusion Matrix](./images/confusion matrix.png)
+
 
 7. Key Challenges & Solutions
 Challenge	Solution
