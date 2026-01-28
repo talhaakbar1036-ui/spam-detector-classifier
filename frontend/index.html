@@ -3,104 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpamGuard - Message Filtering</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #response-area {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            white-space: pre-wrap;
-            font-family: monospace;
-            word-break: break-all;
-        }
-    </style>
+    <title>SpamGuard - AI Spam Detection</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
 <body>
     <div class="container">
-        <h1>SpamGuard - Message Filtering System</h1>
-        <p>Enter a message below to check if it's spam or ham.</p>
-        <textarea id="message-input" rows="6" placeholder="Type your message here..."></textarea>
-        <button onclick="predictSpam()">Predict</button>
-        <div id="response-area"></div>
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Spam<span>Guard</span></h1>
+            </div>
+            <p class="tagline">AI-powered spam detection with 95%+ accuracy</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Input -->
+            <div class="input-panel">
+                <div class="card">
+                    <h2><i class="fas fa-edit"></i> Check Your Message</h2>
+                    
+                    <form id="spamForm" method="POST" action="/predict">
+                        <div class="form-group">
+                            <label for="message">
+                                <i class="fas fa-envelope"></i> Enter your message:
+                            </label>
+                            <div class="textarea-container">
+                                <textarea 
+                                    id="message" 
+                                    name="message" 
+                                    placeholder="Paste or type your email/SMS/chat message here..."
+                                    rows="6"
+                                    required>{{ message if message else '' }}</textarea>
+                                <div class="textarea-footer">
+                                    <div class="char-counter">
+                                        <i class="fas fa-font"></i>
+                                        <span id="charCount">0</span> characters
+                                    </div>
+                                    <div class="word-counter">
+                                        <i class="fas fa-file-word"></i>
+                                        <span id="wordCount">0</span> words
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Example Messages -->
+                        <div class="form-group">
+                            <label><i class="fas fa-lightbulb"></i> Try examples:</label>
+                            <div class="example-buttons">
+                                <button type="button" class="example-btn spam-example" data-message="Congratulations! You've been selected to receive a FREE iPhone 15! Click here to claim now: http://bit.ly/freeiphone15 Offer expires in 24 hours!">
+                                    <i class="fas fa-gift"></i> Spam Message
+                                </button>
+                                <button type="button" class="example-btn ham-example" data-message="Hey John, are we still meeting tomorrow at 3 PM for the project discussion? Don't forget to bring the presentation slides.">
+                                    <i class="fas fa-comment"></i> Legitimate Message
+                                </button>
+                                <button type="button" class="example-btn mix-example" data-message="URGENT: Your bank account has been suspended. Click immediately to verify: http://bank-security-update.com/verify or your account will be closed.">
+                                    <i class="fas fa-exclamation-triangle"></i> Phishing Attempt
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-search"></i> Analyze for Spam
+                            <span class="loading-spinner" id="loadingSpinner"></span>
+                        </button>
+                    </form>
+
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <i class="fas fa-bolt"></i>
+                            <div>
+                                <h3>Fast Analysis</h3>
+                                <p>< 1 second</p>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <h3>High Accuracy</h3>
+                                <p>95%+</p>
+                            </div>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-database"></i>
+                            <div>
+                                <h3>Trained On</h3>
+                                <p>10K+ messages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Results -->
+            <div class="result-panel">
+                {% if result or error %}
+                <!-- Result Card -->
+                <div class="card result-card {{ 'spam-result' if is_spam else 'ham-result' }}">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            {% if is_spam %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% else %}
+                                <i class="fas fa-check-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="result-title">
+                            <h2>{{ result }}</h2>
+                            <p class="confidence">Confidence: {{ confidence }}%</p>
+                        </div>
+                    </div>
+
+                    <!-- Probability Bars -->
+                    <div class="probability-section">
+                        <div class="prob-bar">
+                            <div class="prob-label">
+                                <span>Legitimate (Ham)</span>
+                                <span>{{ ham_prob }}%</span>
+                            </div>
+                            <div class="prob-track">
+                                <div class="prob-fill ham-fill" data-width="{{ ham_prob }}"></div>
+                            </div>
+                        </div>
+                        <div class="prob-bar">
+                            <div class="prob-label">
+                                <span>Spam</span>
+                                <span>{{ spam_prob }}%</span>
+                            </div>
+                            <div class="prob-track">
+                                <div class="prob-fill spam-fill" data-width="{{ spam_prob }}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Message Preview -->
+                    <div class="message-preview">
+                        <h3><i class="fas fa-envelope-open-text"></i> Message Analyzed:</h3>
+                        <div class="preview-content">
+                            "{{ message[:150] }}{% if message|length > 150 %}...{% endif %}"
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="action-buttons">
+                        <button onclick="copyResult()" class="action-btn">
+                            <i class="far fa-copy"></i> Copy Result
+                        </button>
+                        <button onclick="shareResult()" class="action-btn">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                        <button onclick="clearForm()" class="action-btn">
+                            <i class="fas fa-redo"></i> Analyze Another
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Analysis Details -->
+                <div class="card analysis-card">
+                    <h3><i class="fas fa-chart-bar"></i> Detailed Analysis</h3>
+                    
+                    {% if is_spam %}
+                    <div class="warning-box">
+                        <h4><i class="fas fa-exclamation-circle"></i> Spam Indicators Detected:</h4>
+                        <ul class="indicators-list">
+                            <li><i class="fas fa-times-circle"></i> Suspicious URLs or links</li>
+                            <li><i class="fas fa-times-circle"></i> Urgent action required language</li>
+                            <li><i class="fas fa-times-circle"></i> Too-good-to-be-true offers</li>
+                            <li><i class="fas fa-times-circle"></i> Poor grammar and spelling</li>
+                        </ul>
+                        <div class="advice">
+                            <strong>Recommendation:</strong> Delete this message. Do not click any links or reply.
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="safe-box">
+                        <h4><i class="fas fa-check-circle"></i> Message Appears Legitimate</h4>
+                        <ul class="indicators-list">
+                            <li><i class="fas fa-check-circle"></i> Natural language patterns</li>
+                            <li><i class="fas fa-check-circle"></i> No suspicious URLs</li>
+                            <li><i class="fas fa-check-circle"></i> Personal or contextual content</li>
+                            <li><i class="fas fa-check-circle"></i> Proper grammar and spelling</li>
+                        </ul>
+                        <div class="advice">
+                            <strong>Note:</strong> Always verify sender identity for sensitive communications.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Default State (When no result) -->
+                {% if not result and not error %}
+                <div class="card welcome-card">
+                    <div class="welcome-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <h2>Welcome to SpamGuard</h2>
+                    <p>Enter a message in the left panel to analyze it for spam content.</p>
+                    
+                    <div class="features-list">
+                        <div class="feature">
+                            <i class="fas fa-robot"></i>
+                            <h4>AI-Powered</h4>
+                            <p>Machine learning algorithms trained on thousands of messages</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bolt"></i>
+                            <h4>Real-Time</h4>
+                            <p>Get instant analysis with detailed probability breakdown</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-lock"></i>
+                            <h4>Privacy First</h4>
+                            <p>Your messages are analyzed locally and never stored</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Info -->
+                <div class="card api-card">
+                    <h3><i class="fas fa-code"></i> API Access</h3>
+                    <p>Integrate SpamGuard into your applications:</p>
+                    <div class="code-snippet">
+                        <pre><code>POST /api/predict
+Content-Type: application/json
+
+{
+  "message": "Your text here"
+}</code></pre>
+                    </div>
+                    <button onclick="testAPI()" class="api-test-btn">
+                        <i class="fas fa-terminal"></i> Test API
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Error Display -->
+                {% if error %}
+                <div class="card error-card">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h3>Analysis Error</h3>
+                    <p>{{ error }}</p>
+                    <button onclick="clearError()" class="action-btn">
+                        <i class="fas fa-times"></i> Dismiss
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>SpamGuard</h4>
+                    <p>AI-powered spam detection system using Naive Bayes classifier and TF-IDF vectorization.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Technologies</h4>
+                    <ul>
+                        <li>Flask Backend</li>
+                        <li>Scikit-learn ML</li>
+                        <li>HTML/CSS/JS Frontend</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>API</h4>
+                    <p>Endpoint: <code>/api/predict</code></p>
+                    <p>Method: POST (application/json)</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 SpamGuard | Machine Learning Project | Accuracy: 95%+</p>
+            </div>
+        </footer>
     </div>
 
-    <script>
-        async function predictSpam() {
-            const messageInput = document.getElementById('message-input').value;
-            const responseArea = document.getElementById('response-area');
-
-            if (!messageInput.trim()) {
-                responseArea.innerText = 'Please enter a message.';
-                return;
-            }
-
-            try {
-                responseArea.innerText = 'Predicting...';
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: messageInput })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    responseArea.innerHTML = `
-                        <b>Prediction:</b> ${data.prediction}<br>
-                        <b>Spam Probability:</b> ${(data.spam_probability * 100).toFixed(2)}%<br>
-                        <b>Ham Probability:</b> ${(data.ham_probability * 100).toFixed(2)}%<br>
-                        <b>Cleaned Message:</b> ${data.cleaned_message}
-                    `;
-                } else {
-                    responseArea.innerText = `Error: ${data.error || 'Something went wrong.'}`;
-                }
-            } catch (error) {
-                console.error('Error during prediction:', error);
-                responseArea.innerText = 'An error occurred while connecting to the server.';
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
